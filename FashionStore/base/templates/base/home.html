@@ -1,0 +1,45 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<section id="hero">
+    <h4> Chào mừng đến với cửa hàng</h4>
+    <h1>Bộ sưu tập mới</h1>
+    <p>Giảm giá ngày ra mắt lên đến 50%</p>
+    <button>Shop Now</button>
+</section>
+
+<section id="feature" class="section-p1">
+    <div class="fe-box">
+        <a href="/">
+            <img src="{% static 'images/forMen.jpg'%}" alt="forMen">
+        </a>
+        <h6>Men Fashion</h6>
+    </div>
+</section>
+
+<section id="product1" class="section-p1">
+    <h2>Featured Products</h2>
+    <p>Bộ sưu tập xu hướng 2023</p>
+
+    <div class="pro-container">
+        <div class="pro">
+            <img src="{% static 'images\pro1.png'%}" alt="">    
+            <div class="des">
+                <span>Bad Habbit</span>
+                <h5>GREY RENAISSANCE STAMP TEE</h5>
+                <div class="star">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <h4>400.000</h4>
+            </div>    
+            <a href="#"><i class="fa-solid fa-cart-shopping"></i></a>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}
