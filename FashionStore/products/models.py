@@ -1,47 +1,20 @@
 from django.db import models
-from django.utils.text import slugify
+from base.models import BaseModel
 # Create your models here.
-class Category(models.Model):
+
+class Category(BaseModel):
     category_name = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=200, blank=True)
-    
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.category_name)
-        super(Category, self).save(*args, **kwargs)
+    slug = models.SlugField(unique=True, null=True,blank=True)
+    category_image = models.ImageField(upload_to="categories")
 
-    def __str__(self) -> str:
-        return self.category_name
-    
-class QuantityVariant(models.Model):
-    variant_name = models.CharField(max_length=100)
-
-    def __str__(self) -> str:
-        return self.variant_name
-
-class ColorVariant(models.Model):
-    color_name = models.CharField(max_length=100)
-    color_code = models.CharField(max_length=100)
-
-    def __str__(self) -> str:
-        return self.color_name
-
-class SizeVariant(models.Model):
-    size_name = models.CharField(max_length=100)
-
-    def __str__(self) -> str:
-        return self.size_name
-
-class Product(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+class Product(BaseModel):
     product_name = models.CharField(max_length=100)
-    image = models.ImageField(upload_to='static/image/products')
-    price = models.CharField(max_length=20)
-    description = models.TextField()
-    stock = models.IntegerField(default=100)
+    slug = models.SlugField(unique=True, null=True,blank=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="products")
+    price = models.IntegerField()
+    product_description = models.TextField()
+    ription = models.TextField()
 
-    quantity_type = models.ForeignKey(QuantityVariant, blank=True, null=True , on_delete=models.PROTECT)
-    color_type = models.ForeignKey(ColorVariant, blank=True, null=True, on_delete=models.PROTECT)
-    size_type = models.ForeignKey(SizeVariant, blank=True, null=True, on_delete=models.PROTECT)
-
-    def __str__(self) -> str:
-        return self.product_name
+class ProductImage(BaseModel):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="product_images")
+    image = models.ImageField(upload_to="product")
