@@ -56,7 +56,7 @@
     
     <div class="card-body border-top">
         <a href="#" class="btn btn-primary float-md-right"> Make Purchase <i class="fa fa-chevron-right"></i> </a>
-        <a href="#" class="btn btn-light"> <i class="fa fa-chevron-left"></i> Continue shopping </a>
+        <a href="{% url 'index' %}" class="btn btn-light"> <i class="fa fa-chevron-left"></i> Continue shopping </a>
     </div>	
     </div> <!-- card.// -->
     
@@ -68,16 +68,22 @@
         <aside class="col-md-3">
             <div class="card mb-3">
                 <div class="card-body">
-                <form>
+                <form method="POST">
+                    {% include "base/alert.html" %}
+                    {% csrf_token %}
                     <div class="form-group">
                         <label>Have coupon?</label>
                         <div class="input-group">
-                            <input type="text" class="form-control" name="" placeholder="Coupon code">
+                            <input type="text" name="coupon" class="form-control" placeholder="Coupon code">
                             <span class="input-group-append"> 
-                                <button class="btn btn-primary">Apply</button>
+                                <button type="submit" class="btn btn-primary">Apply</button>
                             </span>
                         </div>
                     </div>
+                    <p>Coupon have applied (click to remove):</p>
+                    {% if cart.coupon %}
+                    <a href="{% url 'remove_coupon' cart.uid %}" class="btn btn-success">{{ cart.coupon.coupon_code }}</a>
+                    {% endif %}
                 </form>
                 </div> <!-- card-body.// -->
             </div>  <!-- card .// -->
@@ -86,7 +92,7 @@
 
                         <dl class="dlist-align">
                           <dt>Total:</dt>
-                          <dd class="text-right  h5"><strong>{{get_cart_total}}</strong></dd>
+                          <dd class="text-right  h5"><strong>{{cart.get_cart_total}}</strong></dd>
                         </dl>
                         <hr> 
                         
