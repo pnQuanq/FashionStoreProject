@@ -50,9 +50,9 @@ $(document).ready(function() {
 				</div> <!-- brand-wrap.// -->
 			</div>
 			<div class="col-lg-6 col-sm-12">
-				<form action="#" class="search">
+				<form action="#" class="from-incline my-2 my-lg-0">
 					<div class="input-group w-100">
-						<input type="search" class="form-control" name="que" placeholder="Search" aria-label="Search">
+						<input type="search" class="form-control mr-sm-2" name="que" placeholder="Search" aria-label="Search">
 						<div class="input-group-append">
 						  <button class="btn btn-primary" type="submit">
 							<i class="fa fa-search"></i>
@@ -93,9 +93,9 @@ $(document).ready(function() {
 					<div class="widget-header  mr-3">
 						<a href="{% url 'index' %}" >ALL</a>
 					</div>
-					{% for topic in topics %}
+					{% for cate in categories %}
 					<div class="widget-header  mr-3">
-						<a href="{% url 'index' %}?q={{topic.name}}" >{{topic.name}}</a>
+						<a href="{% url 'index' %}?q={{cate.category_name}}" >{{cate.category_name}}</a>
 					</div>
 					{% endfor %}
 				</div> <!-- widgets-wrap.// -->
