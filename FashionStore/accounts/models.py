@@ -9,8 +9,8 @@ from products.models import ColorVariant, Coupon, Product, SizeVariant
 # Create your models here.
 class Profile(BaseModel):
     user = models.OneToOneField(User , on_delete=models.CASCADE , related_name="profile")
-    is_email_vertified = models.BooleanField(default=False, null=True, blank=True)
-    email_token = models.CharField(max_length=100, null=True, blank=True)
+    username = models.CharField(max_length=100,null=True)
+    password = models.CharField(max_length=100,null=True)
     profile_image = models.ImageField(upload_to='profile')
 
     def get_cart_count(self):
@@ -55,15 +55,3 @@ class CartItems(BaseModel):
             size_variant_price = self.size_variant.price
             price.append(size_variant_price)
         return sum(price)
-
-@receiver(post_save , sender = User)
-def  send_email_token(sender , instance , created , **kwargs):
-    try:
-        if created:
-            email_token = str(uuid.uuid4())
-            Profile.objects.create(user = instance , email_token = email_token)
-            email = instance.email
-            send_account_activation_email(email , email_token)
-
-    except Exception as e:
-        print(e)

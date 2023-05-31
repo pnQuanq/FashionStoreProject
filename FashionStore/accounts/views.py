@@ -3,6 +3,7 @@ from django.shortcuts import redirect, render
 from django.contrib import messages      
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate , login , logout
+from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponseRedirect,HttpResponse
 
 from products.models import *
@@ -10,73 +11,47 @@ from products.models import *
 from .models import Cart, CartItems, Profile
 
 
+def profile(request):
+    return render(request ,'accounts/profile.html')
+
 def login_page(request):
     
     if request.method == 'POST':
-        email = request.POST.get('email')
+        username = request.POST.get('username').lower()
         password = request.POST.get('password')
-        user_obj = User.objects.filter(username = email)
+        
 
-        if not user_obj.exists():
+        try:
+            user_obj = User.objects.filter(username = username)   
+        except:
             messages.warning(request, 'Account not found.')
             return HttpResponseRedirect(request.path_info)
+ 
+        user_obj = authenticate(request , username = username , password= password)
 
-
-        if not user_obj[0].profile.is_email_verified:
-            messages.warning(request, 'Your account is not verified.')
-            return HttpResponseRedirect(request.path_info)
-
-        user_obj = authenticate(username = email , password= password)
         if user_obj:
             login(request , user_obj)
             return redirect('/')
-
-        
-
-        messages.warning(request, 'Invalid credentials')
-        return HttpResponseRedirect(request.path_info)
-
+        else:
+            messages.warning(request, 'Username or password does not exist.')
+            return HttpResponseRedirect(request.path_info)
 
     return render(request ,'accounts/login.html')
 
 
 def register_page(request):
-
+    form = UserCreationForm()
     if request.method == 'POST':
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        user_obj = User.objects.filter(username = email)
-
-        if user_obj.exists():
-            messages.warning(request, 'Email is already taken.')
-            return HttpResponseRedirect(request.path_info)
-
-        print(email)
-
-        user_obj = User.objects.create(first_name = first_name , last_name= last_name , email = email , username = email)
-        user_obj.set_password(password)
-        user_obj.save()
-
-        messages.success(request, 'An email has been sent on your mail.')
-        return HttpResponseRedirect(request.path_info)
-
-
-    return render(request ,'accounts/register.html')
-
-
-
-
-def activate_email(request , email_token):
-    try:
-        user = Profile.objects.get(email_token= email_token)
-        user.is_email_verified = True
-        user.save()
-        return redirect('/')
-    except Exception as e:
-        return HttpResponse('Invalid Email token')
-
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.username = user.username.lower()
+            user.save()
+            login(request, user)
+            return redirect('index')
+        else:
+            messages.warning(request, 'An error occurred during registration.')
+    return render(request ,'accounts/register.html', {'form' : form})
 
 def add_to_cart(request , uid):
     variant = request.GET.get('variant')
