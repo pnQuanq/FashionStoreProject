@@ -7,11 +7,14 @@ import uuid
 from base.emails import send_account_activation_email
 from products.models import ColorVariant, Coupon, Product, SizeVariant
 # Create your models here.
+
 class Profile(BaseModel):
     user = models.OneToOneField(User , on_delete=models.CASCADE , related_name="profile")
     username = models.CharField(max_length=100,null=True)
     password = models.CharField(max_length=100,null=True)
     profile_image = models.ImageField(upload_to='profile')
+    address = models.CharField(max_length=200, null=True)
+    name = models.CharField(max_length=100,null=True)
 
     def get_cart_count(self):
         return CartItems.objects.filter(cart__is_paid = False, cart__user = self.user ).count()

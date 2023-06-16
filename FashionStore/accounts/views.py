@@ -3,55 +3,69 @@ from django.shortcuts import redirect, render
 from django.contrib import messages      
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate , login , logout
-from django.contrib.auth.forms import UserCreationForm
+from .forms import ProfileForm
 from django.http import HttpResponseRedirect,HttpResponse
 
 from products.models import *
 # Create your views here.
 from .models import Cart, CartItems, Profile
+from django.contrib.auth.decorators import login_required 
 
+@login_required(login_url='login')
+def editProfile(request):
+    user = request.user
+    p_form = ProfileForm(instance=user)
 
+    context = {'p_form': p_form}
+    return render(request ,'accounts/editProfile.html', context)
+
+@login_required(login_url='login')
 def profile(request):
     return render(request ,'accounts/profile.html')
 
 def login_page(request):
     
     if request.method == 'POST':
-        username = request.POST.get('username')
+        username = request.POST.get('userName')
         password = request.POST.get('password')
-        
+        user_obj = User.objects.filter(username = username)
 
-        try:
-            user_obj = User.objects.filter(username = username)   
-        except:
+        if not user_obj.exists():
             messages.warning(request, 'Account not found.')
             return HttpResponseRedirect(request.path_info)
- 
-        user_obj = authenticate(request , username = username , password= password)
 
+
+
+        user_obj = authenticate(username = username , password= password)
         if user_obj:
             login(request , user_obj)
             return redirect('/')
-        else:
-            messages.warning(request, 'Username or password does not exist.')
-            return HttpResponseRedirect(request.path_info)
+
+        
+
+        messages.warning(request, 'Invalid credentials')
+        return HttpResponseRedirect(request.path_info)
 
     return render(request ,'accounts/login.html')
 
-
 def register_page(request):
-    form = UserCreationForm()
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.username = user.username
-            user.save()
-            login(request, user)
-            return redirect('index')
+    if request.method=='POST':
+        user_name = request.POST.get('userName')
+        email = request.POST.get('email')
+        firstName = request.POST.get('first_name')
+        lastName = request.POST.get('last_name')
+        password = request.POST.get('password')
+        re_pass = request.POST.get('rePassword')
+
+        if password != re_pass:
+            messages.warning(request, 'Coupon already exists.')
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
         else:
-            messages.warning(request, 'An error occurred during registration.')
-    return render(request ,'accounts/register.html', {'form' : form})
+            user = User.objects.create_user(first_name = firstName , last_name= lastName , email = email , username = user_name)
+            user.set_password(password)
+            user.save()
+            return redirect('index')
+    return render(request ,'accounts/register.html')
 
 def add_to_cart(request , uid):
     variant = request.GET.get('variant')
